@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ManagerMapper">
+
+<!--    <resultMap id="Manager" type="com.entity.Manager">-->
+<!--        <result column="manager_id" jdbcType="VARCHAR" property="manager_id" />-->
+<!--        <result column="manager_name" jdbcType="VARCHAR" property="manager_name" />-->
+<!--        <result column="manager_pwd" jdbcType="VARCHAR" property="manager_pwd" />-->
+<!--    </resultMap>-->
+
+    <select id="queryManagerByEntity" resultType="com.entity.Manager">
+        select * from manager where manager_id = #{manager_id} and manager_pwd = #{manager_pwd}
+    </select>
+    
+    <select id="queryAllManager" resultType="com.entity.Manager">
+        select * from manager
+    </select>
+
+    <insert id="addManager" parameterType="com.entity.Manager">
+        insert into manager (manager_id,manager_name,manager_pwd)
+        values (#{manager_id},#{manager_name},#{manager_pwd})
+    </insert>
+
+    <update id="updateManager" parameterType="com.entity.Manager">
+        update manager set manager_name = #{manager_name} where manager_id = #{manager_id}
+    </update>
+
+    <delete id="deleteManager" parameterType="com.entity.Manager">
+        delete from manager where manager_id = #{manager_id}
+    </delete>
+</mapper>

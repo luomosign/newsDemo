@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>管理员信息列表</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">    
+		<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+		<meta http-equiv="description" content="This is my page">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/iview.css">
+	  <script type="text/javascript" src="js/vue.min.js"></script>
+	  <script type="text/javascript" src="js/iview.min.js"></script>
+  	<script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+	  <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+  </head>
+  
+  <body>
+  	<div id="articleList">
+  		<div class="main-frame">
+  			
+  			<div class="top">
+				<h1>新闻发布管理系统</h1>
+ 		  	</div>
+	  
+		  	<div class="left-menu">
+				<h1 class="title">导航菜单</h1>
+				<ul>
+					<li><a href="managerList.html">用户管理</a></li>
+					<li><a href="navList.html">类别管理</a></li>
+					<li><a href="articleList.html">文章管理</a></li>
+					<li><a href="login.html">退出系统</a></li>
+				</ul>
+		  	</div>
+		  	
+		 	<div class="right">
+				<div class="admin">
+			  		<h1 class="title">新闻信息管理<a href="main.html" class="back-btn">返回</a></h1>
+			  		
+			  		<div class="articleSelect">
+			  			新闻类别：
+                        <i-select v-model="nav_name1" size="big" style="width:200px">
+                            <i-option v-for="item in type" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+                        </i-select>
+                        
+                		标题：
+                		<i-input v-model="article_title1" type="text" style="width: 200px" /></li>
+                    </div>
+                    <div>
+                    	<i-Button type="primary"  @click="articleSelect1">搜索</i-Button>
+                    </div>
+                    
+                    <div class="articleTable">
+                    	<i-Table border highlight-row @on-current-change="multipleSelect"
+                		:columns="articleListTable" :data="articleListTableData" height="450"></i-Table>
+                		
+                		<i-Button type="primary"  @click="articleAdd">添加新闻</i-Button>
+		            	<i-Button type="primary"  @click="articleEdit">修改</i-Button>
+		            	<i-Button type="primary"  @click="articleDelete">删除</i-Button>
+                    </div>
+                    
+                    <div>
+			  			<Modal v-model="addArticleFlage" ok-text="确认添加" title="增加新闻"
+	               		:mask-closable="true" width="600px" @on-ok="articleAdd1" @on-cancel="articleAddCancel">
+	
+				            <div class="modalUl">
+				                <ul>
+				
+				                    <li><span>新闻标题：</span>
+				                        <i-input v-model="article_title" type="text" style="width:200px" /></li>
+				
+				                    <li><span>新闻类别：</span>
+				                        <i-select v-model="nav_name" size="big" style="width:200px">
+                            				<i-option v-for="item in type" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+                       					</i-select></li>
+                   					
+               						<li><span>发布时间：</span>
+				                        <!--<i-input v-model="article_title" type="text" />-->
+				                        <Date-picker v-model="article_date" type="date" placeholder="选择日期" style="width: 200px"></Date-picker></li>
+				                        
+			                        <li><span>新闻正文：</span>
+										<i-input v-model="article_content" type="textarea" :rows="4"/>
+				
+				                </ul>
+				            </div>
+		            	</Modal>
+			  		</div>
+			  		
+			  		<div>
+			  			<Modal v-model="editArticleFlage" ok-text="确认修改" title="新闻修改"
+	              		 :mask-closable="true" width="600px" @on-ok="articleEdit1">
+	
+				            <div class="modalUl">
+				                <ul>
+				
+				                    <li><span>新闻标题：</span>
+				                        <i-input v-model="article_title" type="text" style="width:200px" /></li>
+				
+				                    <li><span>新闻类别：</span>
+				                        <i-select v-model="nav_name" size="big" style="width:200px">
+                            				<i-option v-for="item in type" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+                       					</i-select></li>
+                   					
+               						<li><span>发布时间：</span>
+				                        <Date-picker v-model="article_date" type="date" placeholder="选择日期" style="width: 200px"></Date-picker></li>
+
+			                        <li><span>新闻正文：</span>
+										<i-input v-model="article_content" type="textarea" :rows="4"/>
+				
+				                </ul>
+				            </div>
+				            
+			            </Modal>
+			  		</div>-->
+                    
+			 	</div>
+			</div>
+	
+	  	</div>
+	  	
+		<div class="footer">
+	 		<p>XX学院  地址：XXXX<br/>电话：XXXXX  邮编：XXXXX</p>
+	  	</div>
+
+  	</div>
+  	
+	<script type="text/javascript">
+
+	    var articleList = new Vue({
+	        el:"#articleList",
+	        data: {
+	        	
+	        	addArticleFlage:false,
+	        	editArticleFlage:false,
+	        	
+	        	currentRow:[],
+            	oldCurrentRow:[],
+            	
+            	articleListTableData:[],
+            	
+            	articleListTable:[
+	            {
+	                type: 'index',
+	                width: 60,
+	                align: 'center'
+	            },
+	            {
+	                title: '新闻标题',
+	                key: 'article_title',
+	                align: 'center',
+	            },
+	            {
+	                title: '类别名称',
+	                key: 'nav_name',
+	                align: 'center',
+	            },
+	            {
+	                title: '发布时间',
+	                key: 'article_date',
+	                align: 'center',
+	            },
+	        	],
+	        	
+	        	article_id:"",
+	        	article_title:"",
+	        	article_date:"",
+	        	article_content:"",
+	        	nav_name:"",
+				nav_name1:"",
+				article_title1:"",
+	        	
+	        	type:[],
+	        	
+	        },
+	        methods :{
+	        	multipleSelect:function (currentRow,oldCurrentRow) {
+						this.currentRow = currentRow;
+						this.oldCurrentRow = oldCurrentRow;
+        		},
+	        	articleSelect:function () {
+					var that = this;
+
+					$.ajax({
+						url: "/queryAllArticle",    //请求的url地址
+						dataType: "json",   //返回格式为json
+						async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+						data: {},    //参数值
+						type: "POST",   //请求方式
+						/* beforeSend: function() {
+                             //请求前的处理
+                         }, */
+						success: function(data) {
+							console.log(data);
+							that.articleListTableData = data;
+						},
+						complete: function() {
+							//请求完成的处理
+						},
+						error: function() {
+							//请求出错处理
+							alert("异常发生");
+						}
+					});
+	        	},
+				articleSelect1:function () {
+	        		if (this.article_title1 != "" || this.nav_name != "") {
+	        			var that = this;
+
+	        			var article_title = this.article_title1;
+	        			var nav_name = this.nav_name1;
+
+						$.ajax({
+							url: "/queryArticleByTitle",    //请求的url地址
+							dataType: "json",   //返回格式为json
+							async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+							data: {
+								"article_title": article_title,    //用户名
+								"nav_name": nav_name,
+							},    //参数值
+							type: "POST",   //请求方式
+							/* beforeSend: function() {
+                                 //请求前的处理
+                             }, */
+							success: function (data) {
+								console.log(data);
+								that.articleListTableData = data;
+							},
+							complete: function () {
+								//请求完成的处理
+							},
+							error: function () {
+								//请求出错处理
+								alert("异常发生");
+							}
+						})
+	        		} else {
+						that.$Message.info({
+							content: '搜索栏不可为空！',
+							duration: 5,
+							closable: true
+						});
+					}
+				},
+	        	articleAdd:function () {
+					this.addArticleFlage = true;
+					this.article_title = "";
+					this.article_date = "";
+					this.article_content = "";
+					this.nav_name = "";
+				},
+	        	articleAdd1:function () {
+
+	        		var that = this;
+
+					function format(userDate) {
+						var date = new Date(userDate);
+						var y = date.getFullYear();
+						var m = date.getMonth() + 1;
+						m = m < 10 ? ('0' + m) : m;
+						var d = date.getDate();
+						d = d < 10 ? ('0' + d) : d;
+						return y + '-' + m + '-' + d;
+					}
+
+					this.article_date = format(this.article_date);
+
+					if (this.article_title == "") {
+	        			that.$Message.info({
+			                content: '新闻标题不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.nav_name == "") {
+	        			that.$Message.info({
+			                content: '新闻类别不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.article_date == "") {
+	        			that.$Message.info({
+			                content: '新闻发布时间不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.article_content == "") {
+	        			that.$Message.info({
+			                content: '新闻内容不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else {
+							var that = this;        	
+							var article_id = this.article_id; 	 
+							var article_title = this.article_title;
+							var article_date = this.article_date;
+							var article_content=this.article_content;
+							var nav_name = this.nav_name;
+	        			 $.ajax({
+	        			           url: "/addArticle",    //请求的url地址
+	        			           dataType: "json",   //返回格式为json
+	        			           async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+	        			           data: { 
+	        			   					"article_id": article_id,       //用户ID
+	        								"article_title":article_title,    //用户名
+	        								"article_date":article_date,
+											"article_content":article_content,
+											"nav_name":nav_name,
+	        			   					  },    //参数值
+	        			          type: "POST",   //请求方式
+	        			         /* beforeSend: function() {
+	        			              //请求前的处理
+	        			          }, */
+	        			          success: function(data) {
+									  if("true"==data){
+										that.articleSelect();
+									  }                       
+	        			          },
+	        			          complete: function() {
+	        			              //请求完成的处理
+	        			          },
+	        			          error: function() {
+	        			              //请求出错处理
+	        			   			  alert("异常发生");
+	        			          }
+	        			});
+	        			
+	        			
+	        		}
+	        	},
+	        	articleAddCancel:function () {
+	        		this.article_title = "";
+		        	this.article_date = "";
+		        	this.article_content = "";
+		        	this.nav_name = "";
+	        	},
+	        	articleEdit:function () {
+	        		
+	        		var that = this;
+	        	
+		        	if (this.currentRow.length != 0) {
+	                    this.editArticleFlage = true;
+			        	this.article_title = this.currentRow.article_title;
+			        	this.article_date = this.currentRow.article_date;
+			        	this.article_content = this.currentRow.article_content;
+			        	this.nav_name = this.currentRow.nav_name;
+		        	} else {
+		        		that.$Message.info({
+		                content: '请选择要修改的新闻！',
+		                duration: 5,
+		                closable: true
+		            	});
+		        	}
+	        		
+	        	},
+	        	articleEdit1:function () {
+	        		if (this.article_title == "") {
+	        			that.$Message.info({
+			                content: '新闻标题不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.nav_name == "") {
+	        			that.$Message.info({
+			                content: '新闻类别不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.article_date == "") {
+	        			that.$Message.info({
+			                content: '新闻发布时间不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else if (this.article_content == "") {
+	        			that.$Message.info({
+			                content: '新闻内容不可为空！',
+			                duration: 5,
+			                closable: true
+			            });
+	        		} else {
+							var that = this;        	
+							this.article_title = this.currentRow.article_title,
+							this.article_date = this.currentRow.article_date,
+							this.article_content = this.currentRow.article_content,
+							this.nav_name = this.currentRow.nav_name,
+	        			 $.ajax({
+	        			           url: "/updateManager",    //请求的url地址
+	        			           dataType: "json",   //返回格式为json
+	        			           async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+	        			           data: { 
+	        			   					 "manager_id": manager_id,       //用户ID
+	        								 "manager_name":manager_name     //用户名
+	        			   					  },    //参数值
+	        			          type: "POST",   //请求方式
+	        			         /* beforeSend: function() {
+	        			              //请求前的处理
+	        			          }, */
+	        			          success: function(data) {
+									  if(data){
+										 that.articleSelect();  //调用查询所有的方法
+									  }                       
+	        			          },
+	        			          complete: function() {
+	        			              //请求完成的处理
+	        			          },
+	        			          error: function() {
+	        			              //请求出错处理
+	        			   					  alert("异常发生");
+	        			          }
+	        			});
+	        			
+	        			
+	        		}
+	        	},
+	        	articleDelete:function () {
+					var that = this;
+					var article_id = this.currentRow.article_id;
+	        		 
+	        		 $.ajax({
+	        		           url: "/deleteArticle",    //请求的url地址
+	        		           dataType: "json",   //返回格式为json
+	        		           async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+	        		           data: { 
+	        		   				    "article_id": article_id
+							   },    //参数值
+	        		           type: "POST",   //请求方式
+	        		         /* beforeSend: function() {
+	        		              //请求前的处理
+	        		          }, */
+	        		          success: function(data) {
+								  if(data){
+									that.articleSelect();
+								  }
+	        		          },
+	        		          complete: function() {
+	        		              //请求完成的处理
+	        		          },
+	        		          error: function() {
+	        		              //请求出错处理
+	        		   			  alert("异常发生");
+	        		          }
+	        		});
+	        		
+	        		
+	        	}
+	        },
+	        created() {
+	        	var that = this;
+
+				$.ajax({
+					url: "/queryAllArticle",    //请求的url地址
+					dataType: "json",   //返回格式为json
+					async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+					data: {},    //参数值
+					type: "POST",   //请求方式
+					/* beforeSend: function() {
+                         //请求前的处理
+                     }, */
+					success: function(data) {
+						console.log(data);
+						that.articleListTableData = data;
+					},
+					complete: function() {
+						//请求完成的处理
+					},
+					error: function() {
+						//请求出错处理
+						alert("异常发生");
+					}
+				});
+
+				$.ajax({
+					url: "/queryAllNav",    //请求的url地址
+					dataType: "json",   //返回格式为json
+					async: true, //请求是否异步，默认为异步，这也是ajax重要特性
+					data: {},    //参数值
+					type: "POST",   //请求方式
+					/* beforeSend: function() {
+                         //请求前的处理
+                     }, */
+					success: function(data) {
+						console.log(data);
+						for (var i = 0; i < data.length; i++) {
+							that.type.push({value:data[i].nav_name,label:data[i].nav_name})
+						}
+
+					},
+					complete: function() {
+						//请求完成的处理
+					},
+					error: function() {
+						//请求出错处理
+						alert("异常发生");
+					}
+				});
+	        }
+	    })
+    
+    </script>
+	   
+  </body>
+</html>

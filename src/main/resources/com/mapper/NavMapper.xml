@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.NavMapper">
+    <select id="queryAllNav" resultType="com.entity.Nav">
+        select * from nav
+    </select>
+    <insert id="addNav" parameterType="com.entity.Nav">
+        insert into nav (nav_id,nav_name,nav_feight)
+        values (#{nav_id},#{nav_name},#{nav_feight})
+    </insert>
+    <update id="updateNav" parameterType="com.entity.Nav">
+        update nav set nav_name = #{nav_name},nav_feight = #{nav_feight} where nav_id = #{nav_id}
+    </update>
+
+    <delete id="deleteNav" parameterType="com.entity.Nav">
+        delete from nav where nav_id = #{nav_id}
+    </delete>
+</mapper>
